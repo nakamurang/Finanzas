@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Modal, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { Colors } from '../constants/colors';
 import { CATEGORIES, INCOME_CATEGORIES, SUBCATEGORIES, PAYMENT_METHODS, CURRENCIES } from '../constants/data';
+import BottomSheetPicker from './BottomSheetPicker';
 
 
 export default function ExpenseFormModal({ visible, onClose, onSubmit, initialData, isIncome }) {
@@ -104,116 +105,40 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                         )}
 
                         <Text style={styles.inputLabel}>Select Category:</Text>
-                        <View style={[styles.dropdownWrapper, { zIndex: 2000 }]}>
-                            <TouchableOpacity
-                                style={styles.dropdownSelector}
-                                onPress={() => setShowDropdown(!showDropdown)}
-                            >
-                                <Text style={styles.dropdownText}>{category}</Text>
-                                <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
-                            </TouchableOpacity>
-
-                            {showDropdown && (
-                                <View style={styles.dropdownList}>
-                                    {currentCategories.map((cat) => (
-                                        <TouchableOpacity
-                                            key={cat}
-                                            style={styles.dropdownItem}
-                                            onPress={() => {
-                                                setCategory(cat);
-                                                setShowDropdown(false);
-                                            }}
-                                        >
-                                            <Text style={styles.dropdownItemText}>{cat}</Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-                            )}
-                        </View>
+                        <TouchableOpacity
+                            style={styles.dropdownSelector}
+                            onPress={() => setShowDropdown(true)}
+                        >
+                            <Text style={styles.dropdownText}>{category}</Text>
+                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
+                        </TouchableOpacity>
 
                         <Text style={styles.inputLabel}>Select Subcategory:</Text>
-                        <View style={[styles.dropdownWrapper, { zIndex: 1500 }]}>
-                            <TouchableOpacity
-                                style={styles.dropdownSelector}
-                                onPress={() => setShowSubcategoryDropdown(!showSubcategoryDropdown)}
-                            >
-                                <Text style={styles.dropdownText}>{subcategory}</Text>
-                                <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
-                            </TouchableOpacity>
-
-                            {showSubcategoryDropdown && (
-                                <View style={styles.dropdownList}>
-                                    {SUBCATEGORIES.map((subcat) => (
-                                        <TouchableOpacity
-                                            key={subcat}
-                                            style={styles.dropdownItem}
-                                            onPress={() => {
-                                                setSubcategory(subcat);
-                                                setShowSubcategoryDropdown(false);
-                                            }}
-                                        >
-                                            <Text style={styles.dropdownItemText}>{subcat}</Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-                            )}
-                        </View>
+                        <TouchableOpacity
+                            style={styles.dropdownSelector}
+                            onPress={() => setShowSubcategoryDropdown(true)}
+                        >
+                            <Text style={styles.dropdownText}>{subcategory}</Text>
+                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
+                        </TouchableOpacity>
 
                         <Text style={styles.inputLabel}>Payment Method:</Text>
-                        <View style={[styles.dropdownWrapper, { zIndex: 1000 }]}>
-                            <TouchableOpacity
-                                style={styles.dropdownSelector}
-                                onPress={() => setShowPaymentDropdown(!showPaymentDropdown)}
-                            >
-                                <Text style={styles.dropdownText}>{paymentMethod}</Text>
-                                <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
-                            </TouchableOpacity>
-
-                            {showPaymentDropdown && (
-                                <View style={styles.dropdownList}>
-                                    {PAYMENT_METHODS.map((method) => (
-                                        <TouchableOpacity
-                                            key={method}
-                                            style={styles.dropdownItem}
-                                            onPress={() => {
-                                                setPaymentMethod(method);
-                                                setShowPaymentDropdown(false);
-                                            }}
-                                        >
-                                            <Text style={styles.dropdownItemText}>{method}</Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-                            )}
-                        </View>
+                        <TouchableOpacity
+                            style={styles.dropdownSelector}
+                            onPress={() => setShowPaymentDropdown(true)}
+                        >
+                            <Text style={styles.dropdownText}>{paymentMethod}</Text>
+                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
+                        </TouchableOpacity>
 
                         <Text style={styles.inputLabel}>Currency:</Text>
-                        <View style={[styles.dropdownWrapper, { zIndex: 500 }]}>
-                            <TouchableOpacity
-                                style={styles.dropdownSelector}
-                                onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                            >
-                                <Text style={styles.dropdownText}>{currency}</Text>
-                                <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
-                            </TouchableOpacity>
-
-                            {showCurrencyDropdown && (
-                                <ScrollView style={styles.dropdownList} nestedScrollEnabled={true}>
-                                    {CURRENCIES.map((curr) => (
-                                        <TouchableOpacity
-                                            key={curr.code}
-                                            style={styles.dropdownItem}
-                                            onPress={() => {
-                                                setCurrency(curr.code);
-                                                setShowCurrencyDropdown(false);
-                                            }}
-                                        >
-                                            <Text style={styles.dropdownItemText}>{curr.code} - {curr.name}</Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </ScrollView>
-                            )}
-                        </View>
+                        <TouchableOpacity
+                            style={styles.dropdownSelector}
+                            onPress={() => setShowCurrencyDropdown(true)}
+                        >
+                            <Text style={styles.dropdownText}>{currency}</Text>
+                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
+                        </TouchableOpacity>
 
                         <View style={styles.modalButtons}>
                             <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onClose}>
@@ -226,6 +151,43 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                     </View>
                 </ScrollView>
             </View>
+
+            {/* Bottom Sheet Pickers */}
+            <BottomSheetPicker
+                visible={showDropdown}
+                options={currentCategories}
+                selectedValue={category}
+                onSelect={setCategory}
+                onClose={() => setShowDropdown(false)}
+                title="Select Category"
+            />
+
+            <BottomSheetPicker
+                visible={showSubcategoryDropdown}
+                options={SUBCATEGORIES}
+                selectedValue={subcategory}
+                onSelect={setSubcategory}
+                onClose={() => setShowSubcategoryDropdown(false)}
+                title="Select Subcategory"
+            />
+
+            <BottomSheetPicker
+                visible={showPaymentDropdown}
+                options={PAYMENT_METHODS}
+                selectedValue={paymentMethod}
+                onSelect={setPaymentMethod}
+                onClose={() => setShowPaymentDropdown(false)}
+                title="Payment Method"
+            />
+
+            <BottomSheetPicker
+                visible={showCurrencyDropdown}
+                options={CURRENCIES}
+                selectedValue={currency}
+                onSelect={setCurrency}
+                onClose={() => setShowCurrencyDropdown(false)}
+                title="Select Currency"
+            />
         </Modal>
     );
 }
