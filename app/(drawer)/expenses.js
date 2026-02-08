@@ -27,11 +27,23 @@ export default function ExpensesScreen() {
   // Group expenses when the expenses list changes
   useFocusEffect(
     useCallback(() => {
-      // Sort by ID (timestamp) descending
-      const sorted = [...expenses].sort((a, b) => Number(b.id) - Number(a.id));
+      // Helper to parse DD/MM/YYYY and HH:mm into a Date object
+      const parseDateTime = (item) => {
+        if (!item.date || !item.time) return new Date(Number(item.id));
+        const [day, month, year] = item.date.split('/');
+        const [hours, minutes] = item.time.split(':');
+        return new Date(year, month - 1, day, hours, minutes);
+      };
+
+      // Sort by parsed date descending
+      const sorted = [...expenses].sort((a, b) => {
+        const dateA = parseDateTime(a);
+        const dateB = parseDateTime(b);
+        return dateB - dateA;
+      });
 
       const grouped = sorted.reduce((acc, expense) => {
-        const expenseDate = new Date(Number(expense.id));
+        const expenseDate = parseDateTime(expense);
         const monthYear = expenseDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
         let section = acc.find(s => s.title === monthYear);
@@ -82,12 +94,9 @@ export default function ExpensesScreen() {
     if (editingItem) {
       updateExpense(editingItem.id, data);
     } else {
-      const now = new Date();
       const newItem = {
         id: Date.now().toString(),
         ...data,
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       addExpense(newItem);
     }

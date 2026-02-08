@@ -47,9 +47,18 @@ export default function App() {
     return item.type === 'income' ? sum + convertedAmount : sum - convertedAmount;
   }, 0).toFixed(2);
 
-  const filteredExpenses = filterCategory === 'All'
+  // Helper to parse DD/MM/YYYY and HH:mm into a Date object
+  const parseDateTime = (item) => {
+    if (!item.date || !item.time) return new Date(Number(item.id));
+    const [day, month, year] = item.date.split('/');
+    const [hours, minutes] = item.time.split(':');
+    return new Date(year, month - 1, day, hours, minutes);
+  };
+
+  const filteredExpenses = (filterCategory === 'All'
     ? expenses
-    : expenses.filter(item => item.category === filterCategory);
+    : expenses.filter(item => item.category === filterCategory)
+  ).sort((a, b) => parseDateTime(b) - parseDateTime(a));
 
   // --- HANDLERS ---
   const handleOpenAddExpense = () => {
