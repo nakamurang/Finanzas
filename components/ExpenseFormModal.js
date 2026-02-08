@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Modal, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, Text, View, Modal, ScrollView, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView } from 'react-native';
 import { Colors } from '../constants/colors';
 import { CATEGORIES, INCOME_CATEGORIES, SUBCATEGORIES, PAYMENT_METHODS, CURRENCIES } from '../constants/data';
 import BottomSheetPicker from './BottomSheetPicker';
@@ -70,87 +70,127 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
 
     return (
         <Modal visible={visible} animationType="slide">
-            <View style={styles.modalContainer}>
-                <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.modalTitle}>
-                            {initialData ? (isIncome ? 'Edit Income' : 'Edit Expense') : (isIncome ? 'New Income' : 'New Expense')}
+            <KeyboardAvoidingView
+                style={styles.modalContainer}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                {/* Fixed Header */}
+                <View style={styles.header}>
+                    <TouchableOpacity style={styles.headerButton} onPress={onClose}>
+                        <Text style={styles.headerButtonText}>Cancel</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.modalTitle}>
+                        {initialData ? (isIncome ? 'Edit Income' : 'Edit Expense') : (isIncome ? 'New Income' : 'New Expense')}
+                    </Text>
+                    <TouchableOpacity style={styles.headerButton} onPress={handleSave}>
+                        <Text style={[styles.headerButtonText, styles.saveText]}>
+                            {initialData ? 'Update' : 'Save'}
                         </Text>
+                    </TouchableOpacity>
+                </View>
 
+                {/* Scrollable Content */}
+                <ScrollView
+                    style={styles.scrollContent}
+                    contentContainerStyle={styles.scrollContentContainer}
+                    showsVerticalScrollIndicator={true}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    {/* Amount Section */}
+                    <View style={styles.amountSection}>
+                        <Text style={styles.sectionLabel}>Amount</Text>
+                        <View style={styles.amountRow}>
+                            <TextInput
+                                style={styles.amountInput}
+                                placeholder="0.00"
+                                placeholderTextColor="#666"
+                                keyboardType="numeric"
+                                value={amount}
+                                onChangeText={setAmount}
+                            />
+                            <TouchableOpacity
+                                style={styles.currencyPill}
+                                onPress={() => setShowCurrencyDropdown(true)}
+                            >
+                                <Text style={styles.currencyPillText}>{currency}</Text>
+                                <Text style={styles.dropdownArrow}>▼</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    {/* Details Section */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Details</Text>
+
+                        <Text style={styles.inputLabel}>Description</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder={isIncome ? "Source (e.g. Salary)" : "What did you buy?"}
-                            placeholderTextColor="#888"
+                            placeholder={isIncome ? "Source (e.g. Salary)" : "What did you spend on?"}
+                            placeholderTextColor="#666"
                             value={description}
                             onChangeText={setDescription}
                         />
 
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Amount ($)"
-                            placeholderTextColor="#888"
-                            keyboardType="numeric"
-                            value={amount}
-                            onChangeText={setAmount}
-                        />
-
                         {!isIncome && (
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Place / Location"
-                                placeholderTextColor="#888"
-                                value={place}
-                                onChangeText={setPlace}
-                            />
+                            <>
+                                <Text style={styles.inputLabel}>Place / Location</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Where did you spend?"
+                                    placeholderTextColor="#666"
+                                    value={place}
+                                    onChangeText={setPlace}
+                                />
+                            </>
                         )}
+                    </View>
 
-                        <Text style={styles.inputLabel}>Select Category:</Text>
-                        <TouchableOpacity
-                            style={styles.dropdownSelector}
-                            onPress={() => setShowDropdown(true)}
-                        >
-                            <Text style={styles.dropdownText}>{category}</Text>
-                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
-                        </TouchableOpacity>
+                    {/* Categories Section */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Classification</Text>
 
-                        <Text style={styles.inputLabel}>Select Subcategory:</Text>
-                        <TouchableOpacity
-                            style={styles.dropdownSelector}
-                            onPress={() => setShowSubcategoryDropdown(true)}
-                        >
-                            <Text style={styles.dropdownText}>{subcategory}</Text>
-                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
-                        </TouchableOpacity>
+                        <View style={styles.fieldRow}>
+                            <View style={styles.fieldHalf}>
+                                <Text style={styles.inputLabel}>Category</Text>
+                                <TouchableOpacity
+                                    style={styles.dropdownSelector}
+                                    onPress={() => setShowDropdown(true)}
+                                >
+                                    <Text style={styles.dropdownText}>{category}</Text>
+                                    <Text style={styles.dropdownArrow}>▼</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.fieldHalf}>
+                                <Text style={styles.inputLabel}>Subcategory</Text>
+                                <TouchableOpacity
+                                    style={styles.dropdownSelector}
+                                    onPress={() => setShowSubcategoryDropdown(true)}
+                                >
+                                    <Text style={styles.dropdownText}>{subcategory}</Text>
+                                    <Text style={styles.dropdownArrow}>▼</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
 
-                        <Text style={styles.inputLabel}>Payment Method:</Text>
+                    {/* Payment Section */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Payment</Text>
+
+                        <Text style={styles.inputLabel}>Payment Method</Text>
                         <TouchableOpacity
                             style={styles.dropdownSelector}
                             onPress={() => setShowPaymentDropdown(true)}
                         >
                             <Text style={styles.dropdownText}>{paymentMethod}</Text>
-                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
+                            <Text style={styles.dropdownArrow}>▼</Text>
                         </TouchableOpacity>
-
-                        <Text style={styles.inputLabel}>Currency:</Text>
-                        <TouchableOpacity
-                            style={styles.dropdownSelector}
-                            onPress={() => setShowCurrencyDropdown(true)}
-                        >
-                            <Text style={styles.dropdownText}>{currency}</Text>
-                            <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
-                        </TouchableOpacity>
-
-                        <View style={styles.modalButtons}>
-                            <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onClose}>
-                                <Text style={styles.buttonText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-                                <Text style={[styles.buttonText, styles.saveButtonText]}>{initialData ? 'Update' : 'Save'}</Text>
-                            </TouchableOpacity>
-                        </View>
                     </View>
+
+                    {/* Spacer for bottom */}
+                    <View style={{ height: 40 }} />
                 </ScrollView>
-            </View>
+            </KeyboardAvoidingView>
 
             {/* Bottom Sheet Pickers */}
             <BottomSheetPicker
@@ -196,26 +236,138 @@ const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
         backgroundColor: Colors.background,
-        justifyContent: 'center',
     },
-    inputContainer: {
-        padding: 20,
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.border,
         backgroundColor: Colors.surface,
-        margin: 16,
+    },
+    headerButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 4,
+        minWidth: 60,
+    },
+    headerButtonText: {
+        fontSize: 16,
+        color: Colors.textSecondary,
+    },
+    saveText: {
+        color: Colors.primary,
+        fontWeight: '600',
+        textAlign: 'right',
+    },
+    modalTitle: {
+        fontSize: 17,
+        fontWeight: '600',
+        color: Colors.text,
+        textAlign: 'center',
+    },
+    scrollContent: {
+        flex: 1,
+    },
+    scrollContentContainer: {
+        padding: 16,
+    },
+    amountSection: {
+        backgroundColor: Colors.surface,
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        alignItems: 'center',
+    },
+    sectionLabel: {
+        fontSize: 12,
+        color: Colors.textSecondary,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: 8,
+    },
+    amountRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    amountInput: {
+        fontSize: 42,
+        fontWeight: '600',
+        color: Colors.text,
+        textAlign: 'center',
+        minWidth: 150,
+    },
+    currencyPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.border,
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 20,
+        gap: 6,
+    },
+    currencyPillText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: Colors.text,
+    },
+    section: {
+        backgroundColor: Colors.surface,
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+    },
+    sectionTitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: Colors.textSecondary,
+        marginBottom: 12,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    fieldRow: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    fieldHalf: {
+        flex: 1,
+    },
+    inputLabel: {
+        fontSize: 13,
+        fontWeight: '500',
+        marginBottom: 6,
+        color: Colors.textSecondary,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: Colors.border,
+        backgroundColor: Colors.inputBackground,
+        color: Colors.text,
+        padding: 14,
         borderRadius: 10,
-        elevation: 3,
-
-        ...Platform.select({
-            web: {
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-            },
-            default: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-            },
-        }),
+        marginBottom: 12,
+        fontSize: 16,
+    },
+    dropdownSelector: {
+        borderWidth: 1,
+        borderColor: Colors.border,
+        backgroundColor: Colors.inputBackground,
+        padding: 14,
+        borderRadius: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    dropdownText: {
+        fontSize: 16,
+        color: Colors.text,
+    },
+    dropdownArrow: {
+        fontSize: 12,
+        color: Colors.textSecondary,
     },
     modalTitle: {
         fontSize: 24,
