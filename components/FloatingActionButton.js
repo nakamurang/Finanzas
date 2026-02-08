@@ -90,7 +90,7 @@ export default function FloatingActionButton({ onAddExpense, onAddIncome }) {
                 <TouchableOpacity onPress={() => handleAction(onAddExpense)} style={styles.actionRow}>
                     <Text style={styles.label}>Add Expense</Text>
                     <View style={[styles.iconContainer, styles.expenseIcon]}>
-                        <Ionicons name="remove" size={24} color="#000" />
+                        <Ionicons name="add" size={24} color="#000" />
                     </View>
                 </TouchableOpacity>
             </Animated.View>
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 'auto',
         height: 'auto',
+        right: 6,
     },
     secondary: {
         // width: 48,
@@ -149,6 +150,8 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: 4,
         overflow: 'hidden',
+        width: 110,
+        textAlign: 'right',
     },
     iconContainer: {
         width: 48,

@@ -3,22 +3,45 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 
+const getCategoryIcon = (category) => {
+    switch (category) {
+        case 'Food': return 'fast-food-outline';
+        case 'Transport': return 'car-outline';
+        case 'Entertainment': return 'game-controller-outline';
+        case 'Bills': return 'receipt-outline';
+        case 'Salary': return 'cash-outline';
+        case 'Gift': return 'gift-outline';
+        case 'Investment': return 'trending-up-outline';
+        case 'Other': return 'apps-outline';
+        default: return 'help-circle-outline';
+    }
+};
+
 export default function ExpenseItem({ item, onPress, onDelete }) {
+    const iconName = getCategoryIcon(item.category);
+
     return (
-        <TouchableOpacity onPress={() => onPress(item)}>
-            <View style={styles.expenseItem}>
-                <View>
-                    <Text style={styles.expenseDescription}>{item.description}</Text>
-                    {item.place ? <Text style={styles.expenseSubtext}>@ {item.place}</Text> : null}
-                    <Text style={styles.expenseSubtext}>{item.category} • {item.paymentMethod}</Text>
-                    <Text style={styles.expenseDate}>{item.date} at {item.time}</Text>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onPress(item)}>
+            <View style={styles.container}>
+                <View style={styles.leftSection}>
+                    <View style={styles.iconContainer}>
+                        <Ionicons name={iconName} size={24} color={Colors.text} />
+                    </View>
+                    <View style={styles.detailsContainer}>
+                        <Text style={styles.description} numberOfLines={1}>{item.description}</Text>
+                        <Text style={styles.subtext}>
+                            {item.category} {item.place ? `• ${item.place}` : ''}
+                        </Text>
+                        <Text style={styles.dateSubtext}>{item.date} • {item.time}</Text>
+                    </View>
                 </View>
-                <View style={styles.amountContainer}>
-                    <Text style={styles.expenseAmount}>
+
+                <View style={styles.rightSection}>
+                    <Text style={[styles.amount, { color: item.type === 'income' ? '#4CAF50' : Colors.text }]}>
                         {item.type === 'income' ? '+' : '-'}{item.currency} {item.amount}
                     </Text>
                     <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteButton}>
-                        <Ionicons name="trash-outline" size={20} color={Colors.textSecondary} />
+                        <Ionicons name="trash-outline" size={18} color={Colors.textSecondary} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -27,40 +50,57 @@ export default function ExpenseItem({ item, onPress, onDelete }) {
 }
 
 const styles = StyleSheet.create({
-    expenseItem: {
+    container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: Colors.background, // Match background
-        paddingVertical: 15,
-        paddingHorizontal: 0, // Remove side padding if desired, or keep it
+        alignItems: 'center',
+        paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: Colors.border,
     },
-    expenseDescription: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: Colors.text,
+    leftSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
     },
-    expenseSubtext: {
-        fontSize: 12,
+    iconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: Colors.inputBackground,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    detailsContainer: {
+        flex: 1,
+    },
+    description: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: Colors.text,
+        marginBottom: 2,
+    },
+    subtext: {
+        fontSize: 13,
+        color: Colors.textSecondary,
+    },
+    dateSubtext: {
+        fontSize: 11,
         color: Colors.textSecondary,
         marginTop: 2,
+        opacity: 0.7,
     },
-    amountContainer: {
+    rightSection: {
         alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        height: 48,
     },
-    expenseDate: {
-        fontSize: 12,
-        color: Colors.textSecondary,
-        marginTop: 4,
-    },
-    expenseAmount: {
+    amount: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: Colors.text,
     },
     deleteButton: {
-        padding: 5,
-        marginTop: 4,
+        padding: 4,
     },
 });
