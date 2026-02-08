@@ -4,25 +4,23 @@ import {
   Text,
   View,
   TouchableOpacity,
-  FlatList,
   StatusBar,
   ScrollView,
-  Platform
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useExpenses } from '../../hooks/useExpenses';
-import ExpenseItem from '../../components/ExpenseItem';
 import ExpenseFormModal from '../../components/ExpenseFormModal';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { Colors } from '../../constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import FloatingActionButton from '../../components/FloatingActionButton';
-
-const CATEGORIES = ['Food', 'Transport', 'Entertainment', 'Bills', 'Other'];
+import { CURRENCIES } from '../../constants/data';
 
 export default function App() {
   const { expenses, addExpense, updateExpense, deleteExpense } = useExpenses();
   const [filterCategory, setFilterCategory] = useState('All');
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const insets = useSafeAreaInsets();
 
   // Modal State
@@ -34,7 +32,10 @@ export default function App() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
-  const totalAmount = expenses.reduce((sum, item) => {
+  // Filter expenses by selected currency and calculate total
+  const currencyExpenses = expenses.filter(item => item.currency === selectedCurrency);
+
+  const totalAmount = currencyExpenses.reduce((sum, item) => {
     const val = parseFloat(item.amount);
     return item.type === 'income' ? sum + val : sum - val;
   }, 0).toFixed(2);
@@ -54,17 +55,6 @@ export default function App() {
     setEditingItem(null);
     setIsIncomeModal(true);
     setModalVisible(true);
-  };
-
-  const handleEditItem = (item) => {
-    setEditingItem(item);
-    setIsIncomeModal(item.type === 'income');
-    setModalVisible(true);
-  };
-
-  const handleDeleteRequest = (id) => {
-    setItemToDelete(id);
-    setDeleteModalVisible(true);
   };
 
   const handleConfirmDelete = () => {
@@ -98,7 +88,37 @@ export default function App() {
         {/* Toggle handled by Drawer Navigator, but we can add a custom menu icon if needed 
             Usually Drawer provides the hamburger menu. */}
         <Text style={styles.totalLabel}>Total Balance</Text>
-        <Text style={styles.totalText}>${totalAmount}</Text>
+
+        {/* Total with clickable currency code */}
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalAmount}>$ {totalAmount} </Text>
+          <TouchableOpacity
+            style={styles.currencyCodeButton}
+            onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+          >
+            <Text style={styles.currencyCode}>{selectedCurrency}</Text>
+            <Ionicons name="chevron-down" size={20} color={Colors.text} style={{ marginLeft: 4 }} />
+          </TouchableOpacity>
+
+          {showCurrencyDropdown && (
+            <View style={styles.currencyDropdown}>
+              <ScrollView style={styles.currencyList} nestedScrollEnabled={true}>
+                {CURRENCIES.map((curr) => (
+                  <TouchableOpacity
+                    key={curr.code}
+                    style={styles.currencyItem}
+                    onPress={() => {
+                      setSelectedCurrency(curr.code);
+                      setShowCurrencyDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.currencyItemText}>{curr.code}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* FLOATING ACTION BUTTON */}
@@ -145,10 +165,52 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  totalText: {
+  totalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    position: 'relative',
+    zIndex: 1000,
+  },
+  currencyCodeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  currencyCode: {
     fontSize: 32,
     fontWeight: 'bold',
     color: Colors.text,
-    marginTop: 5,
+  },
+  totalAmount: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginLeft: 8,
+  },
+  currencyDropdown: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    marginTop: 4,
+    backgroundColor: Colors.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    maxHeight: 200,
+    elevation: 5,
+    zIndex: 1001,
+  },
+  currencyList: {
+    maxHeight: 200,
+  },
+  currencyItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  currencyItemText: {
+    fontSize: 14,
+    color: Colors.text,
   },
 });
