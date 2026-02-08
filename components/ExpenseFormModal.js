@@ -4,6 +4,7 @@ import { Colors } from '../constants/colors';
 
 const CATEGORIES = ['Food', 'Transport', 'Entertainment', 'Bills', 'Other'];
 const INCOME_CATEGORIES = ['Salary', 'Gift', 'Investment', 'Other'];
+const SUBCATEGORIES = ['Entertainment', 'Work', 'Home', 'Other'];
 const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Debit Card', 'Transfer'];
 const CURRENCIES = ['USD', 'EUR', 'ARS'];
 
@@ -11,10 +12,12 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [category, setCategory] = useState(isIncome ? 'Salary' : 'Other');
+    const [subcategory, setSubcategory] = useState('Other');
     const [place, setPlace] = useState('');
     const [currency, setCurrency] = useState('USD');
     const [paymentMethod, setPaymentMethod] = useState('Cash');
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showSubcategoryDropdown, setShowSubcategoryDropdown] = useState(false);
     const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
 
     useEffect(() => {
@@ -23,6 +26,7 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                 setDescription(initialData.description);
                 setAmount(initialData.amount);
                 setCategory(initialData.category);
+                setSubcategory(initialData.subcategory || 'Other');
                 setPlace(initialData.place || '');
                 setCurrency(initialData.currency);
                 setPaymentMethod(initialData.paymentMethod);
@@ -36,10 +40,12 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
         setDescription('');
         setAmount('');
         setCategory(isIncome ? 'Salary' : 'Other');
+        setSubcategory('Other');
         setPlace('');
         setCurrency('USD');
         setPaymentMethod('Cash');
         setShowDropdown(false);
+        setShowSubcategoryDropdown(false);
         setShowPaymentDropdown(false);
     };
 
@@ -50,6 +56,7 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
             description,
             amount: parseFloat(amount).toFixed(2),
             category,
+            subcategory,
             place: isIncome ? '' : place,
             currency,
             paymentMethod,
@@ -120,6 +127,34 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                                             }}
                                         >
                                             <Text style={styles.dropdownItemText}>{cat}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+
+                        <Text style={styles.inputLabel}>Select Subcategory:</Text>
+                        <View style={[styles.dropdownWrapper, { zIndex: 1500 }]}>
+                            <TouchableOpacity
+                                style={styles.dropdownSelector}
+                                onPress={() => setShowSubcategoryDropdown(!showSubcategoryDropdown)}
+                            >
+                                <Text style={styles.dropdownText}>{subcategory}</Text>
+                                <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
+                            </TouchableOpacity>
+
+                            {showSubcategoryDropdown && (
+                                <View style={styles.dropdownList}>
+                                    {SUBCATEGORIES.map((subcat) => (
+                                        <TouchableOpacity
+                                            key={subcat}
+                                            style={styles.dropdownItem}
+                                            onPress={() => {
+                                                setSubcategory(subcat);
+                                                setShowSubcategoryDropdown(false);
+                                            }}
+                                        >
+                                            <Text style={styles.dropdownItemText}>{subcat}</Text>
                                         </TouchableOpacity>
                                     ))}
                                 </View>

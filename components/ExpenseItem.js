@@ -30,7 +30,7 @@ export default function ExpenseItem({ item, onPress, onDelete }) {
                     <View style={styles.detailsContainer}>
                         <Text style={styles.description} numberOfLines={1}>{item.description}</Text>
                         <Text style={styles.subtext}>
-                            {item.category} {item.place ? `• ${item.place}` : ''}
+                            {item.category}{item.subcategory && item.subcategory !== 'Other' ? ` (${item.subcategory})` : ''}{item.place ? ` • ${item.place}` : ''}
                         </Text>
                         <Text style={styles.dateSubtext}>{item.date} • {item.time}</Text>
                     </View>
