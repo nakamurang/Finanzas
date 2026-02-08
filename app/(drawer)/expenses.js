@@ -8,6 +8,7 @@ import ExpenseFormModal from '../../components/ExpenseFormModal';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { Colors } from '../../constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import FloatingActionButton from '../../components/FloatingActionButton';
 
 export default function ExpensesScreen() {
   const { expenses, addExpense, updateExpense, deleteExpense } = useExpenses();
@@ -121,17 +122,11 @@ export default function ExpensesScreen() {
         />
       </View>
 
-      {/* FLOATING ACTION BUTTONS */}
-      <View style={[styles.fabContainer, { bottom: 30 + insets.bottom }]}>
-        <TouchableOpacity style={styles.fabButton} onPress={handleOpenAddIncome}>
-          <Ionicons name="add" size={24} color="#000" />
-          <Text style={styles.fabText}>Add Income</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.fabButton} onPress={handleOpenAddExpense}>
-          <Ionicons name="add" size={24} color="#000" />
-          <Text style={styles.fabText}>Add Expense</Text>
-        </TouchableOpacity>
-      </View>
+      {/* FLOATING ACTION BUTTON */}
+      <FloatingActionButton
+        onAddExpense={handleOpenAddExpense}
+        onAddIncome={handleOpenAddIncome}
+      />
 
       {/* MODALS */}
       <ExpenseFormModal
@@ -187,39 +182,5 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 20,
     fontStyle: 'italic',
-  },
-  fabContainer: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    flexDirection: 'row',
-    left: 20, // Make it a bottom bar
-    backgroundColor: Colors.primary,
-    borderRadius: 30,
-    height: 60,
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-    elevation: 5,
-    ...Platform.select({
-      web: {
-        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.3)',
-      },
-      default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-      },
-    }),
-  },
-  fabButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  fabText: {
-    fontWeight: 'bold',
-    color: '#000',
-    fontSize: 16,
   },
 });

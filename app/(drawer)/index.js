@@ -16,6 +16,7 @@ import ExpenseFormModal from '../../components/ExpenseFormModal';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { Colors } from '../../constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import FloatingActionButton from '../../components/FloatingActionButton';
 
 const CATEGORIES = ['Food', 'Transport', 'Entertainment', 'Bills', 'Other'];
 
@@ -100,24 +101,11 @@ export default function App() {
         <Text style={styles.totalText}>${totalAmount}</Text>
       </View>
 
-      {/* LIST SECTION */}
-      {/* ACTION BUTTONS - CENTERED & SEPARATED */}
-      {/* ACTION BUTTONS - CENTERED & SEPARATED */}
-      <View style={[styles.actionsContainer, { paddingBottom: 60 + insets.bottom }]}>
-        <TouchableOpacity style={styles.actionButton} onPress={handleOpenAddExpense}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="add" size={32} color="#000" />
-          </View>
-          <Text style={styles.actionButtonText}>Add Expense</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton} onPress={handleOpenAddIncome}>
-          <View style={[styles.iconCircle, styles.incomeIconCircle]}>
-            <Ionicons name="add" size={32} color="#000" />
-          </View>
-          <Text style={styles.actionButtonText}>Add Income</Text>
-        </TouchableOpacity>
-      </View>
+      {/* FLOATING ACTION BUTTON */}
+      <FloatingActionButton
+        onAddExpense={handleOpenAddExpense}
+        onAddIncome={handleOpenAddIncome}
+      />
 
       {/* MODALS */}
       <ExpenseFormModal
@@ -162,44 +150,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.text,
     marginTop: 5,
-  },
-  actionsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 40,
-    paddingBottom: 50,
-  },
-  actionButton: {
-    alignItems: 'center',
-    gap: 12,
-  },
-  iconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Platform.select({
-      web: {
-        boxShadow: '0px 4px 10px rgba(255, 255, 255, 0.2)',
-      },
-      default: {
-        shadowColor: '#FFF', // Light shadow for contrast on dark bg
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-      },
-    }),
-  },
-  incomeIconCircle: {
-    backgroundColor: '#FFFFFF', // White background for income
-  },
-  actionButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    textAlign: 'center',
   },
 });
