@@ -15,9 +15,12 @@ import { Colors } from '../../constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import FloatingActionButton from '../../components/FloatingActionButton';
 import { CURRENCIES } from '../../constants/data';
+import { useExchangeRates } from '../../hooks/useExchangeRates';
+import { convertCurrency } from '../../utils/currencyConverter';
 
 export default function App() {
   const { expenses, addExpense, updateExpense, deleteExpense } = useExpenses();
+  const { rates, loading: ratesLoading, error: ratesError } = useExchangeRates();
   const [filterCategory, setFilterCategory] = useState('All');
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
@@ -32,12 +35,16 @@ export default function App() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
-  // Filter expenses by selected currency and calculate total
-  const currencyExpenses = expenses.filter(item => item.currency === selectedCurrency);
+  // Convert all expenses to selected currency and calculate total
+  const totalAmount = expenses.reduce((sum, item) => {
+    const amount = parseFloat(item.amount);
 
-  const totalAmount = currencyExpenses.reduce((sum, item) => {
-    const val = parseFloat(item.amount);
-    return item.type === 'income' ? sum + val : sum - val;
+    // Convert to selected currency if rates are available
+    const convertedAmount = rates
+      ? convertCurrency(amount, item.currency, selectedCurrency, rates)
+      : (item.currency === selectedCurrency ? amount : 0);
+
+    return item.type === 'income' ? sum + convertedAmount : sum - convertedAmount;
   }, 0).toFixed(2);
 
   const filteredExpenses = filterCategory === 'All'

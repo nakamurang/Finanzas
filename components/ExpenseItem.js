@@ -49,7 +49,7 @@ export default function ExpenseItem({ item, onPress, onDelete }) {
 
                 <View style={styles.rightSection}>
                     <Text style={[styles.amount, { color: item.type === 'income' ? '#4CAF50' : Colors.text }]}>
-                        {item.type === 'income' ? '+' : '-'}{item.currency} {item.amount}
+                        {item.type === 'income' ? '+' : '-'} {item.amount} {item.currency}
                     </Text>
                     <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteButton}>
                         <Ionicons name="trash-outline" size={18} color={Colors.textSecondary} />
