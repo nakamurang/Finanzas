@@ -6,12 +6,23 @@ import { Colors } from '../constants/colors';
 const getCategoryIcon = (category) => {
     switch (category) {
         case 'Food': return 'fast-food-outline';
-        case 'Transport': return 'car-outline';
-        case 'Entertainment': return 'game-controller-outline';
+        case 'Transport': return 'bus-outline';
+        case 'Car': return 'car-outline';
+        case 'Health': return 'medical-outline';
+        case 'Household': return 'home-outline';
+        case 'Clothes': return 'shirt-outline';
+        case 'Education': return 'school-outline';
         case 'Bills': return 'receipt-outline';
+        case 'Technology': return 'laptop-outline';
+        case 'Pets': return 'paw-outline';
+        case 'Beauty': return 'cut-outline';
+        case 'Gifts': return 'gift-outline';
         case 'Salary': return 'cash-outline';
-        case 'Gift': return 'gift-outline';
+        case 'Freelance': return 'briefcase-outline';
         case 'Investment': return 'trending-up-outline';
+        case 'Gift': return 'gift-outline';
+        case 'Bonus': return 'star-outline';
+        case 'Refund': return 'return-down-back-outline';
         case 'Other': return 'apps-outline';
         default: return 'help-circle-outline';
     }

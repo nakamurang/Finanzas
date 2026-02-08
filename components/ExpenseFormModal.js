@@ -2,11 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Modal, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { Colors } from '../constants/colors';
 
-const CATEGORIES = ['Food', 'Transport', 'Entertainment', 'Bills', 'Other'];
-const INCOME_CATEGORIES = ['Salary', 'Gift', 'Investment', 'Other'];
-const SUBCATEGORIES = ['Entertainment', 'Work', 'Home', 'Other'];
+const CATEGORIES = ['Food', 'Transport', 'Car', 'Health', 'Household', 'Clothes', 'Education', 'Bills', 'Technology', 'Pets', 'Beauty', 'Gifts', 'Other'];
+const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Investment', 'Gift', 'Bonus', 'Refund', 'Other'];
+const SUBCATEGORIES = ['Personal', 'Entertainment', 'Work', 'Home', 'Family', 'Other'];
 const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Debit Card', 'Transfer'];
-const CURRENCIES = ['USD', 'EUR', 'ARS'];
+const CURRENCIES = [
+    { code: 'USD', name: 'US Dollar' },
+    { code: 'EUR', name: 'Euro' },
+    { code: 'GBP', name: 'British Pound' },
+    { code: 'JPY', name: 'Japanese Yen' },
+    { code: 'ARS', name: 'Argentine Peso' },
+    { code: 'BRL', name: 'Brazilian Real' },
+    { code: 'CAD', name: 'Canadian Dollar' },
+    { code: 'AUD', name: 'Australian Dollar' },
+    { code: 'CHF', name: 'Swiss Franc' },
+    { code: 'CNY', name: 'Chinese Yuan' },
+    { code: 'MXN', name: 'Mexican Peso' },
+    { code: 'INR', name: 'Indian Rupee' }
+];
 
 export default function ExpenseFormModal({ visible, onClose, onSubmit, initialData, isIncome }) {
     const [description, setDescription] = useState('');
@@ -19,6 +32,7 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
     const [showDropdown, setShowDropdown] = useState(false);
     const [showSubcategoryDropdown, setShowSubcategoryDropdown] = useState(false);
     const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
+    const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
 
     useEffect(() => {
         if (visible) {
@@ -47,6 +61,7 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
         setShowDropdown(false);
         setShowSubcategoryDropdown(false);
         setShowPaymentDropdown(false);
+        setShowCurrencyDropdown(false);
     };
 
     const handleSave = () => {
@@ -190,16 +205,31 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                         </View>
 
                         <Text style={styles.inputLabel}>Currency:</Text>
-                        <View style={styles.currencyContainer}>
-                            {CURRENCIES.map((curr) => (
-                                <TouchableOpacity
-                                    key={curr}
-                                    style={[styles.filterChip, currency === curr && styles.filterChipActive]}
-                                    onPress={() => setCurrency(curr)}
-                                >
-                                    <Text style={[styles.filterText, currency === curr && styles.filterTextActive]}>{curr}</Text>
-                                </TouchableOpacity>
-                            ))}
+                        <View style={[styles.dropdownWrapper, { zIndex: 500 }]}>
+                            <TouchableOpacity
+                                style={styles.dropdownSelector}
+                                onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+                            >
+                                <Text style={styles.dropdownText}>{currency}</Text>
+                                <Text style={{ fontSize: 12, color: Colors.text }}>▼</Text>
+                            </TouchableOpacity>
+
+                            {showCurrencyDropdown && (
+                                <ScrollView style={styles.dropdownList} nestedScrollEnabled={true}>
+                                    {CURRENCIES.map((curr) => (
+                                        <TouchableOpacity
+                                            key={curr.code}
+                                            style={styles.dropdownItem}
+                                            onPress={() => {
+                                                setCurrency(curr.code);
+                                                setShowCurrencyDropdown(false);
+                                            }}
+                                        >
+                                            <Text style={styles.dropdownItemText}>{curr.code} - {curr.name}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                            )}
                         </View>
 
                         <View style={styles.modalButtons}>
