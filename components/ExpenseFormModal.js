@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Modal, ScrollView, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { CATEGORIES, INCOME_CATEGORIES, SUBCATEGORIES, PAYMENT_METHODS, CURRENCIES } from '../constants/data';
 import BottomSheetPicker from './BottomSheetPicker';
@@ -13,6 +15,9 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
     const [place, setPlace] = useState('');
     const [currency, setCurrency] = useState('USD');
     const [paymentMethod, setPaymentMethod] = useState('Cash');
+    const [date, setDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTimePicker, setShowTimePicker] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showSubcategoryDropdown, setShowSubcategoryDropdown] = useState(false);
     const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
@@ -28,6 +33,20 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                 setPlace(initialData.place || '');
                 setCurrency(initialData.currency);
                 setPaymentMethod(initialData.paymentMethod);
+
+                // Parse date and time if available
+                if (initialData.date && initialData.time) {
+                    try {
+                        const [day, month, year] = initialData.date.split('/');
+                        const [hours, minutes] = initialData.time.split(':');
+                        const newDate = new Date(year, month - 1, day, hours, minutes);
+                        setDate(newDate);
+                    } catch (e) {
+                        setDate(new Date());
+                    }
+                } else {
+                    setDate(new Date());
+                }
             } else {
                 resetForm();
             }
@@ -42,6 +61,9 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
         setPlace('');
         setCurrency('USD');
         setPaymentMethod('Cash');
+        setDate(new Date());
+        setShowDatePicker(false);
+        setShowTimePicker(false);
         setShowDropdown(false);
         setShowSubcategoryDropdown(false);
         setShowPaymentDropdown(false);
@@ -59,6 +81,8 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
             place: isIncome ? '' : place,
             currency,
             paymentMethod,
+            date: date.toLocaleDateString('en-GB'), // DD/MM/YYYY
+            time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
             type: isIncome ? 'income' : 'expense',
         };
 
@@ -173,9 +197,9 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                         </View>
                     </View>
 
-                    {/* Payment Section */}
+                    {/* Payment & Time Section */}
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Payment</Text>
+                        <Text style={styles.sectionTitle}>Payment & Time</Text>
 
                         <Text style={styles.inputLabel}>Payment Method</Text>
                         <TouchableOpacity
@@ -185,7 +209,64 @@ export default function ExpenseFormModal({ visible, onClose, onSubmit, initialDa
                             <Text style={styles.dropdownText}>{paymentMethod}</Text>
                             <Text style={styles.dropdownArrow}>▼</Text>
                         </TouchableOpacity>
+
+                        <Text style={styles.inputLabel}>Date & Time</Text>
+                        <View style={styles.fieldRow}>
+                            <TouchableOpacity
+                                style={[styles.dropdownSelector, styles.fieldHalf]}
+                                onPress={() => setShowDatePicker(true)}
+                            >
+                                <Text style={styles.dropdownText}>{date.toLocaleDateString('en-GB')}</Text>
+                                <Ionicons name="calendar-outline" size={18} color={Colors.textSecondary} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.dropdownSelector, styles.fieldHalf]}
+                                onPress={() => setShowTimePicker(true)}
+                            >
+                                <Text style={styles.dropdownText}>
+                                    {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                </Text>
+                                <Ionicons name="time-outline" size={18} color={Colors.textSecondary} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
+
+                    {/* DateTime Pickers (Hidden triggers) */}
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={date}
+                            mode="date"
+                            display="default"
+                            onChange={(event, selectedDate) => {
+                                setShowDatePicker(false);
+                                if (selectedDate) {
+                                    const newDate = new Date(date);
+                                    newDate.setFullYear(selectedDate.getFullYear());
+                                    newDate.setMonth(selectedDate.getMonth());
+                                    newDate.setDate(selectedDate.getDate());
+                                    setDate(newDate);
+                                }
+                            }}
+                        />
+                    )}
+
+                    {showTimePicker && (
+                        <DateTimePicker
+                            value={date}
+                            mode="time"
+                            display="default"
+                            is24Hour={true}
+                            onChange={(event, selectedTime) => {
+                                setShowTimePicker(false);
+                                if (selectedTime) {
+                                    const newDate = new Date(date);
+                                    newDate.setHours(selectedTime.getHours());
+                                    newDate.setMinutes(selectedTime.getMinutes());
+                                    setDate(newDate);
+                                }
+                            }}
+                        />
+                    )}
 
                     {/* Spacer for bottom */}
                     <View style={{ height: 40 }} />
@@ -368,122 +449,5 @@ const styles = StyleSheet.create({
     dropdownArrow: {
         fontSize: 12,
         color: Colors.textSecondary,
-    },
-    modalTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-        color: Colors.text,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: Colors.border,
-        backgroundColor: Colors.inputBackground,
-        color: Colors.text,
-        padding: 15,
-        borderRadius: 8,
-        marginBottom: 10,
-        fontSize: 16,
-    },
-    inputLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 10,
-        color: Colors.textSecondary,
-    },
-    dropdownWrapper: {
-        marginBottom: 15,
-        position: 'relative',
-    },
-    dropdownSelector: {
-        borderWidth: 1,
-        borderColor: Colors.border,
-        backgroundColor: Colors.inputBackground,
-        padding: 15,
-        borderRadius: 8,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    dropdownText: {
-        fontSize: 16,
-        color: Colors.text,
-    },
-    dropdownList: {
-        position: 'absolute',
-        top: '100%',
-        left: 0,
-        right: 0,
-        marginTop: 4,
-        borderWidth: 1,
-        borderColor: Colors.border,
-        borderRadius: 8,
-        backgroundColor: Colors.inputBackground,
-        zIndex: 1000,
-        elevation: 5,
-    },
-    dropdownItem: {
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#444',
-    },
-    dropdownItemText: {
-        fontSize: 16,
-        color: Colors.text,
-    },
-    currencyContainer: {
-        flexDirection: 'row',
-        marginBottom: 20,
-        gap: 10,
-    },
-    filterChip: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-        backgroundColor: '#333',
-        borderWidth: 1,
-        borderColor: '#444',
-        marginRight: 10,
-    },
-    filterChipActive: {
-        backgroundColor: '#FFFFFF',
-    },
-    filterText: {
-        color: '#FFFFFF',
-    },
-    filterTextActive: {
-        color: '#000000',
-        fontWeight: 'bold',
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: 10,
-    },
-    button: {
-        backgroundColor: Colors.primary,
-        borderWidth: 1,
-        borderColor: '#555',
-        padding: 15,
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    cancelButton: {
-        backgroundColor: Colors.surface, // Or just keep transparent/border
-        borderColor: '#555',
-        flex: 1,
-    },
-    saveButton: {
-        backgroundColor: Colors.primary,
-        flex: 1,
-    },
-    buttonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-    saveButtonText: {
-        color: '#000',
     },
 });

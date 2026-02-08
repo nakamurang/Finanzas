@@ -76,12 +76,9 @@ export default function App() {
     if (editingItem) {
       updateExpense(editingItem.id, data);
     } else {
-      const now = new Date();
       const newItem = {
         id: Date.now().toString(),
         ...data,
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       addExpense(newItem);
     }
